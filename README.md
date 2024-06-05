@@ -23,6 +23,7 @@ Client will be running on localhost's port 3000.
 In this Real-Time Chat Application, a user can simply log-in by just using an Username. Then the Chat interface will be loaded. It allows users to send and receive messages in real-time. A notification icon will be displayed when a new message is received.
 
 User IDs are persistent. Therefore, they will not change over time due to reconnections/low-level connections. User session will remain same even the page is refreshed.
+(Use another browser, or the private mode of the same browser to create another peer.)
 
 ### Limitations
 
