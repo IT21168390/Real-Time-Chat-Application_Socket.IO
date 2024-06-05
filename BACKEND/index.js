@@ -6,7 +6,7 @@ const io = require("socket.io")(httpServer, {
 });
 
 const { InMemorySessionStore } = require("./sessionStore");
-const { InMemoryMessageStore } = require("./messageStore");
+
 const crypto = require("crypto");
 
 const randomId = () => {
@@ -14,7 +14,6 @@ const randomId = () => {
 }
 
 const sessionStore = new InMemorySessionStore();
-const messageStore = new InMemoryMessageStore();
 
 io.use((socket, next) => {
   // Persistent session ID integration
@@ -52,25 +51,6 @@ io.on("connection", (socket) => {
   socket.join(socket.userID);
 
   // fetch existing users
-  /*const users = [];
-  const messagesPerUser = new Map();
-  messageStore.findMessagesForUser(socket.userID).forEach((message) => {
-    const { from, to } = message;
-    const otherUser = socket.userID === from ? to : from;
-    if (messagesPerUser.has(otherUser)) {
-      messagesPerUser.get(otherUser).push(message);
-    } else {
-      messagesPerUser.set(otherUser, [message]);
-    }
-  });
-  sessionStore.findAllSessions().forEach((session) => {
-    users.push({
-      userID: session.userID,
-      username: session.username,
-      connected: session.connected,
-      messages: messagesPerUser.get(session.userID) || [],
-    });
-  });*/
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
@@ -92,25 +72,6 @@ io.on("connection", (socket) => {
       content,
       from: socket.id,
     });
-    /*socket.to(to).emit("private message", {
-      content,
-      from: socket.userID,
-      to,
-    });
-    messageStore.saveMessage(
-      {
-        content,
-        from: socket.userID,
-        to,
-      }
-    )*/
-
-
-    /*socket.to(to).to(socket.userID).emit("private message", {
-      content,
-      from: socket.userID,
-      to,
-    });*/
   });
 
   // notify users upon disconnection
@@ -128,11 +89,9 @@ io.on("connection", (socket) => {
       });
     }
   });
-  /*socket.on("disconnect", () => {
-    socket.broadcast.emit("user disconnected", socket.id);
-  });*/
 });
 
+// Defining the Server Port
 const PORT = process.env.PORT || 4000;
 
 httpServer.listen(PORT, () =>

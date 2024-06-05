@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import socket from '../socket';
+import socket from '../util/socket';
 import MessagesPanel from './MessagesPanel';
 
 export default function Chat() {
@@ -7,72 +7,11 @@ export default function Chat() {
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
-        const initReactiveProperties = (user) => {
+        // Initialize some properties of User
+        const initProperties = (user) => {
             return { ...user, connected: true, messages: [], hasNewMessages: false };
         };
 
-        /*socket.on("users", (users) => {
-            users.forEach((user) => {
-                user.self = user.userID === socket.id;
-                initReactiveProperties(user);
-            });
-            // put the current user first, and then sort by username
-            const usersToSet = users.sort((a, b) => {
-                if (a.self) return -1;
-                if (b.self) return 1;
-                if (a.username < b.username) return -1;
-                return a.username > b.username ? 1 : 0;
-            });
-            setUsers(usersToSet);
-        });
-
-        socket.on("user connected", (user) => {
-            initReactiveProperties(user);
-            theUsers.push(user);
-        });
-
-        socket.on("user disconnected", (id) => {
-            for (let i = 0; i < theUsers.length; i++) {
-                const user = theUsers[i];
-                if (user.userID === id) {
-                    user.connected = false;
-                    break;
-                }
-            }
-        });
-
-        socket.on("private message", ({ content, from }) => {
-            for (let i = 0; i < theUsers.length; i++) {
-                const user = theUsers[i];
-                if (user.userID === from) {
-                    user.messages.push({
-                        content,
-                        fromSelf: false,
-                    });
-                    if (user !== selectedUser) {
-                        user.hasNewMessages = true;
-                    }
-                    break;
-                }
-            }
-        });
-
-        socket.on("connect", () => {
-            theUsers.forEach((user) => {
-                if (user.self) {
-                    user.connected = true;
-                }
-            });
-        });
-
-        socket.on("disconnect", () => {
-            theUsers.forEach((user) => {
-                if (user.self) {
-                    user.connected = false;
-                }
-            });
-        });
-        */
         const handleConnect = () => {
             setUsers(prevUsers =>
                 prevUsers.map(user => ({
@@ -95,7 +34,7 @@ export default function Chat() {
             users = users.map(user => ({
                 ...user,
                 self: user.userID === socket.id,
-            })).map(initReactiveProperties);
+            })).map(initProperties);
             users.sort((a, b) => {
                 if (a.self) return -1;
                 if (b.self) return 1;
@@ -105,7 +44,7 @@ export default function Chat() {
         };
 
         const handleUserConnected = user => {
-            setUsers(prevUsers => [...prevUsers, initReactiveProperties(user)]);
+            setUsers(prevUsers => [...prevUsers, initProperties(user)]);
         };
 
         const handleUserDisconnected = id => {
@@ -139,12 +78,6 @@ export default function Chat() {
         socket.on('private message', handlePrivateMessage);
 
         return () => {
-            /*socket.off("connect");
-            socket.off("disconnect");
-            socket.off("users");
-            socket.off("user connected");
-            socket.off("user disconnected");
-            socket.off("private message");*/
             socket.off('connect', handleConnect);
             socket.off('disconnect', handleDisconnect);
             socket.off('users', handleUsers);
@@ -173,17 +106,18 @@ export default function Chat() {
                         : user
                 )
             );
-            setSelectedUser({ ...selectedUser, messages: [...selectedUser.messages, { content, fromSelf: true }] });
-            /*selectedUser.messages.push({
-                content,
-                fromSelf: true,
-            });*/
+            setSelectedUser(
+                {
+                    ...selectedUser,
+                    messages: [...selectedUser.messages, { content, fromSelf: true }]
+                }
+            );
         }
         console.log(theUsers)
     }
 
+    // Handle selection of the users in left panel
     const onSelectUser = (user) => {
-        //setSelectedUser({ ...user, hasNewMessages: false });
         setSelectedUser(user);
         setUsers(prevUsers =>
             prevUsers.map(u =>

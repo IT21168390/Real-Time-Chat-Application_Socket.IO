@@ -7,6 +7,7 @@ function MessagesPanel({ user, onMessage }) {
         console.log('messages: ', user.messages);
     }, [user.messages])
 
+    // Check whether the sender is the currently logged in user or not
     const displaySender = (index) => {
         return (
             index === 0 || user.messages[index - 1].fromSelf !== user.messages[index].fromSelf
@@ -29,7 +30,7 @@ function MessagesPanel({ user, onMessage }) {
                 {user.messages && user.messages.map((message, index) => (
                     <li key={index} className='message' style={{ color: 'black', backgroundColor: `${message.fromSelf ? '#ffe5b5' : '#f6fc7c'}`, paddingLeft: '10px', paddingTop: '5px' }}>
                         {displaySender(index) && (
-                            <div className='sender'>{message.fromSelf ? 'Yourself:' : user.username+':'}</div>
+                            <div className='sender'>{message.fromSelf ? '(Yourself):' : user.username+':'}</div>
                         )}
                         {message.content}
                     </li>

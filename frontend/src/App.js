@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Chat from './chat-components/Chat';
-import socket from './socket';
+import socket from './util/socket';
 
 function App() {
   const [userName, setUsername] = useState('');
@@ -20,7 +20,7 @@ function App() {
 
   useEffect(() => {
     const sessionID = localStorage.getItem("sessionID");
-
+    // Initiate connection if a sessionID is already available
     if (sessionID) {
       setUserNameSubmitted(true);
       socket.auth = { sessionID };
